@@ -62,12 +62,25 @@ const extractPlacesInfo = (htmlContent) => {
     return result;
 }
 
+// ScraperAPI proxy configuration
+PROXY_USERNAME = 'scraperapi';
+PROXY_PASSWORD = 'API_KEY'; // <-- enter your API_Key here
+PROXY_SERVER = 'proxy-server.scraperapi.com';
+PROXY_SERVER_PORT = '8001';
+
 const main = async () => {
     const browser = await puppeteer.launch({
-        headless: false,
-        args: ["--disabled-setuid-sandbox", "--no-sandbox"],
+        ignoreHTTPSErrors: true,
+        args: [
+            `--proxy-server=http://${PROXY_SERVER}:${PROXY_SERVER_PORT}`
+        ]
     });
     const page = await browser.newPage();
+
+    await page.authenticate({
+        username: PROXY_USERNAME,
+        password: PROXY_PASSWORD,
+    });
 
     await page.setExtraHTTPHeaders({
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13.5; rv:109.0) Gecko/20100101 Firefox/117.0",
