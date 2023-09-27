@@ -1,33 +1,12 @@
-const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const axios = require("axios");
 
 const URL = 'https://www.google.com/search?q=halloween+gift';
-
-const waitFor = (timeInMs) => new Promise(r => setTimeout(r, timeInMs));
+const API_KEY = 'api_key'; // <-- enter your API key here
 
 const extractResultsInfo = (html) => {
     const $ = cheerio.load(html);
-
-    const result = {
-        sponsored: [],
-        organics: [],
-    }
-
-    $('.top-pla-group-inner .pla-unit-container').each((index, el) => {
-        const thumbnail = $(el).find('.Gor6zc').children('img').attr('src');
-        const title = $(el).find('.RnJeZd .pla-unit-title-link').text();
-        const link = $(el).find('.RnJeZd .pla-unit-title-link').attr('href');
-        const price = $(el).find('.orXoSd .e10twf').text();
-        const sellerName = $(el).find('.orXoSd .zPEcBd').attr('aria-label');
-
-        result.sponsored.push({
-            // thumbnail,
-            title,
-            link,
-            price,
-            sellerName
-        });
-    });
+    const result = [];
 
     $('.Ww4FFb').each((_, el) => {
        const title = $(el).find('.LC20lb').text();
@@ -38,7 +17,7 @@ const extractResultsInfo = (html) => {
            return;
        }
 
-       result.organics.push({
+       result.push({
            title,
            link,
            price: null,
@@ -50,30 +29,23 @@ const extractResultsInfo = (html) => {
 }
 
 const runScraper = async () => {
-    const browser = await puppeteer.launch({
-        headless: 'new',
-        args: ["--disabled-setuid-sandbox", "--no-sandbox"],
-    });
-    const page = await browser.newPage();
-
-    await page.setExtraHTTPHeaders({
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13.5; rv:109.0) Gecko/20100101 Firefox/117.0",
+    const searchParams = new URLSearchParams({
+        api_key: API_KEY,
+        url: URL,
+        render: true,
     });
 
-    await page.goto(URL , { waitUntil: 'domcontentloaded', timeout: 60000 });
+    try {
+        const response = await axios.get(`http://api.scraperapi.com/?${searchParams.toString()}`);
 
-    const buttonConsentReject = await page.$('.VfPpkd-LgbsSe[aria-label="Reject all"]');
-    await buttonConsentReject?.click();
+        const html = response.data;
 
-    await waitFor(3000);
+        const result = extractResultsInfo(html);
 
-    const html = await page.content();
-
-    await browser.close();
-
-    const result = extractResultsInfo(html);
-
-    console.log(result);
+        console.log(result);
+    } catch (e) {
+        console.error('Error: ', e);
+    }
 };
 
 (async () => {
