@@ -7,9 +7,9 @@ const pageURLs = [
     'https://google.fr'
 ];
 
-const apiKey = '6f18d81b608007cd8226b736c1f6b462';
+const apiKey = 'API_KEY'; // <-- enter your API_Key here
 const apiUrl = 'https://async.scraperapi.com/batchjobs';
-const callbackUrl = 'https://791f-2605-6440-4010-2000-00-46d2.ngrok.io';
+const callbackUrl = 'https://791f-2605-6440-4010-2000-00-46d2.ngrok.io'; // <-- enter your webhook URL here
 
 const requestData = {
     apiKey: apiKey,
