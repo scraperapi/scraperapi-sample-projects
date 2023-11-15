@@ -19,6 +19,8 @@ const parseProductReview = (inputString) => {
 };
 
 const webScraper = async () => {
+    console.log('Fetching data with ScraperAPI...');
+
     const queryParams = new URLSearchParams({
         api_key: API_KEY,
         url: WALMART_PAGE_URL,
@@ -33,13 +35,15 @@ const webScraper = async () => {
         const $ = cheerio.load(html);
         const productList = [];
 
+        console.log('Extract information from the HTML...');
+
         $("div[data-testid='list-view']").each((_, el) => {
             const link = $(el).prev('a').attr('href');
             const price = $(el).find('.f2').text();
             const priceCents = $(el).find('.f2 + span.f6').text();
             const description = $(el).find("span[data-automation-id='product-title']").text();
-            const reviews = $(el).find('.w_iUH7').last().text();
-            const delivery = $(el).find("div[data-automation-id='fulfillment-badge']").find('span.b').last().text();
+            const reviews = $(el).find("div[data-testid='list-view'] span.w_V_DM + div.flex span.w_iUH7").text();
+            const delivery = $(el).find("div[data-automation-id='fulfillment-badge'] div.f7:last-child span.b:last-child").text();
 
             const { rating, reviewCount } = parseProductReview(reviews);
 
@@ -49,11 +53,11 @@ const webScraper = async () => {
                 averageRating: rating,
                 totalReviews: reviewCount,
                 delivery,
-                link: `https://www.walmart.com${link}`
+                link: link.startsWith('https') ? link : `https://www.walmart.com${link}`
             });
         });
 
-        console.log(productList);
+        console.log('JSON result:', productList);
     } catch (error) {
         console.log(error)
     }
