@@ -27,9 +27,9 @@ app.post('/product-review', async (req, res) => {
             const rating = $(el).find('span.w_iUH7').text();
             const creationDate = $(el).find('div:first-child div:nth-child(2) > div.f7').text();
             const title = $(el).find('div:nth-child(2) h3').text();
-            const description = $(el).find('div:nth-child(2) div').next('span').text();
+            const description = $(el).find('div:nth-child(2) div + span').text();
             const reviewer = $(el).find('div:nth-child(3) > div > div:first-child').text();
-            const incentivizedReview = $(el).find('div:nth-child(3) > div > div:first-child').next('div').text();
+            const incentivizedReview = $(el).find('div:nth-child(3) > div > div:first-child + div').text();
             const upVoteCount = $(el).find('div:last-child button:first-child span').text();
             const downVoteCount = $(el).find('div:last-child button:last-child span').text();
 
